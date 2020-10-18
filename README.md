@@ -1,2 +1,2 @@
-# the-c-programming-language-exercises
-The C Programming Language Second Editions exercises resolutions
+# The C Programming Language Exercises
+A repository for The C Programming Language Second Edition exercises resolutions.
