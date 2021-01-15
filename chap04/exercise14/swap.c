@@ -5,24 +5,19 @@
 
 #include <stdio.h>
 
-#define swap(t, x, y) { t __temp__ = x; x = y; y = __temp__; }
-
-void printarray(int array[], size_t size)
-{
-	size_t i;
-
-	for (i = 0; i < size; ++i)
-		printf("%d%c", array[i], (i + 1 == size) ? '\n' : ' ');
-}
+#define swap(t, x, y) { t __temp__ = (x); (x) = (y); (y) = __temp__; }
 
 int main(void)
 {
-	int array[] = { 10, 20, 30, 40, 50, 60 };
-	const size_t arrsize = sizeof(array) / sizeof(*array);
+	int x = 10, y = 20;
+	double z = 29.4, w = 41.342;
 
-	printarray(array, arrsize);
-	swap(int, array[0], array[3]);
-	printarray(array, arrsize);
+	printf("x: %d, x: %d\n", x, y);
+	swap(int, x, y);
+	printf("x: %d, x: %d\n\n", x, y);
 
+	printf("z: %g, w: %g\n", z, w);
+	swap(double, z, w);
+	printf("z: %g, w: %g\n", z, w);
 	return 0;
 }

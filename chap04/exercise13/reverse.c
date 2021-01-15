@@ -9,42 +9,53 @@
 #define MAXLINE 100
 
 char *reverse(char *);
-int get_line(char *, int);
+char *get_line(char *, size_t);
 
 int main()
 {
 	char line[MAXLINE];
 
-	while (get_line(line, MAXLINE) != EOF)
+	while (get_line(line, MAXLINE))
 		printf("%s\n", reverse(line));
 	return 0;
 }
 
-int get_line(char *line, int max)
+char *get_line(char *line, size_t max)
 {
-	int c, i;
+	int c;
+	char *it = line;
 
-	i = 0;
-	--max;
-	while (i < max && (c=getchar()) != EOF && c != '\n')
-		line[i++] = c;
-	line[i] = '\0';
-	return (i == 0 && c == EOF) ? EOF : i;
+	if (max == 0)
+		return NULL;
+
+	while (--max && (c=getchar()) != EOF && c != '\n')
+		*it++ = c;
+	*it = '\0';
+	return (it == line && c == EOF) ? NULL : line;
+}
+
+void reverse_helper(char *left, char *right)
+{
+	if (left < right)
+	{
+		char temp = *left;
+		*left++ = *right;
+		*right-- = temp;
+		reverse_helper(left, right);
+	}
 }
 
 char *reverse(char *s)
 {
-	size_t i;
-	size_t j = strlen(s);
-
-	if (j > 1)
+	/* if string length is greater than 1 */
+	if (*s != 0 && s[1] != 0)
 	{
-		for (i = 0, --j; i < j; ++i, --j)
-		{
-			char temp = s[i];
-			s[i] = s[j];
-			s[j] = temp;
-		}
+		char *end;
+
+		for (end = s; *end; ++end)
+			;
+		reverse_helper(s, end - 1);
 	}
 	return s;
 }
+

@@ -1,7 +1,6 @@
 /*
- * Exercise 4-3. Given the basic framework, it's strainghtforward to
- * extend the calculator. Add the modulus (%) operator and provisions
- * for negative numbers.
+ * Exercise 4-11. Modify getop so that it doesn't need to use ungetch.
+ * Hint: use a internal static variable.
  */
 
 #include <math.h>
@@ -92,21 +91,28 @@ double stack_pop(void)
 	}
 }
 
-int getch(void);
-void ungetch(int);
-
 int getop(char *s)
 {
+#define ungetch(__c) (save = (__c))
+	static int save = EOF;
 	size_t i = 0;
 	int c;
 
-	while ((s[i] = c = getch()) == ' ' || c == '\t')
-		/* Do nothing */;
+	if (save == EOF)
+		s[i] = c = getchar();
+	else
+	{
+		s[i] = c = save;
+		save = EOF;
+	}
+
+	while (c == ' ' || c == '\t')
+		s[i] = c = getchar();
 
 
 	if (c == '-' || c == '+')
-		s[++i] = c = getch();
-	if (!isdigit(c) && c != '.' && c != 'e' && c )
+		s[++i] = c = getchar();
+	if (!isdigit(c) && c != '.' && c != 'e' && c != 'E')
 	{
 		s[++i] = '\0';
 		if (i > 1 && c != EOF)
@@ -115,13 +121,15 @@ int getop(char *s)
 	}
 	
 	while (isdigit(c))
-		s[++i] = c = getch();
+		s[++i] = c = getchar();
+
 	if (c == '.')
-		while (isdigit(s[++i] = c = getch()))
+		while (isdigit(s[++i] = c = getchar()))
 			;
+
 	if (c == 'e' || c == 'E')
 	{
-		s[++i] = c = getch();
+		s[++i] = c = getchar();
 		if (c == '-' || c == '+' || isdigit(c))
 			while (isdigit(s[++i] = c = getchar()))
 				;
@@ -130,22 +138,4 @@ int getop(char *s)
 	if (c != EOF)
 		ungetch(c);
 	return NUMBER;
-}
-
-#define BUFSIZE 100
-
-char buf[BUFSIZE];
-int bufp = 0;
-
-int getch(void)
-{
-	return (bufp > 0) ? buf[--bufp] : getchar();
-}
-
-void ungetch(int c)
-{
-	if (bufp < BUFSIZE)
-		buf[bufp++] = c;
-	else
-		printf("ungetch: too many characters\n");
 }

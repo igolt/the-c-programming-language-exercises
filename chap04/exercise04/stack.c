@@ -6,12 +6,12 @@
 #include <stdio.h>
 #include <assert.h>
 
-void stack_push(double);
+void   stack_push(double);
 double stack_pop(void);
 double stack_top(void);
-void stack_dup_top_elem(void);
-void stack_swap_top_elem(void);
-void stack_clear(void);
+void   stack_duplicate_top_elem(void);
+void   stack_swap_top_elem(void);
+void   stack_clear(void);
 
 int main(void)
 {
@@ -23,7 +23,7 @@ int main(void)
 	assert(23.5 == stack_pop());
 	assert(12 == stack_top());
 
-	stack_dup_top_elem();
+	stack_duplicate_top_elem();
 
 	assert(12 == stack_pop());
 	assert(12 == stack_top());
@@ -52,10 +52,12 @@ int sp = 0;
 #define STACK_IS_FULL (sp == MAXELEM)
 #define STACK_IS_EMPTY (sp == 0)
 
+#define eputs(err_msg) (fprintf(stderr, err_msg "\n"))
+
 void stack_push(double val)
 {
 	if (STACK_IS_FULL)
-		puts("error: stack is full");
+		eputs("error: stack is full");
 	else
 		stack[sp++] = val;
 }
@@ -64,7 +66,7 @@ double stack_top(void)
 {
 	if (STACK_IS_EMPTY)
 	{
-		puts("error: stack is empty");
+		eputs("error: stack is empty");
 		return 0.0;
 	}
 	return stack[sp - 1];
@@ -74,13 +76,13 @@ double stack_pop(void)
 {
 	if (STACK_IS_EMPTY)
 	{
-		puts("error: stack is empty");
+		eputs("error: stack is empty");
 		return 0.0;
 	}
 	return stack[--sp];
 }
 
-void stack_dup_top_elem(void)
+void stack_duplicate_top_elem(void)
 {
 	stack_push(stack_top());
 }
@@ -88,7 +90,7 @@ void stack_dup_top_elem(void)
 void stack_swap_top_elem(void)
 {
 	if (sp < 2)
-		puts("error: insuficient elements");
+		eputs("error: insuficient elements");
 	else
 	{
 		double temp = stack[sp - 1];

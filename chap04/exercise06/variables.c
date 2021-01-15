@@ -1,7 +1,7 @@
 /*
- * Exercise 4-3. Given the basic framework, it's strainghtforward to
- * extend the calculator. Add the modulus (%) operator and provisions
- * for negative numbers.
+ * Exercise 4-6. Add commands for handling variables. (It's
+ * easy to provide twenty-six variables with single letter
+ * names.) Add a variable for the most recentry printed value.
  */
 
 #include <math.h>
@@ -21,6 +21,7 @@ int main(void)
 	int type;
 	double op2;
 	char s[MAXOP];
+	char variables[26];
 
 	while ((type=getop(s)) != EOF)
 	{
