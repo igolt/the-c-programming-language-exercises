@@ -4,40 +4,39 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <assert.h>
 
-#define TRUE  1
-#define FALSE 0
-
-#define test(s, t)      \
-	printf("s: %s\n", s); \
-	printf("t: %s\n", t); \
-	printf("strend(s,t): %d\n\n", strend(s, t));
+#define ASSERT(assertion)                        \
+	do                                             \
+	{                                              \
+		assert(assertion);                           \
+		puts("Assertion: `" #assertion "': OK");     \
+	} while (0)
 
 int strend(const char *, const char *);
 
 int main(void)
 {
-	test("This is america", "rica");
-	test("This is america", "is");
-	test("This is america", "ica");
-	test("This is america", "ric");
-	test("america", "rica");
-	test("rica", "ric");
-	test("rica", "rica chicka");
+	ASSERT(strend("This is america", "rica") == 1);
+	ASSERT(strend("rica", "This is america") == 0);
+	ASSERT(strend("This is america", "is") == 0);
+	ASSERT(strend("This is america", "ica") == 1);
+	ASSERT(strend("This is america", "ric") == 0);
+	ASSERT(strend("america", "rica") == 1);
+	ASSERT(strend("rica", "ric") == 0);
+	ASSERT(strend("rica", "rica chicka") == 0);
+
 	return 0;
 }
 
 int strend(const char *s, const char *t)
 {
-	const char *sp, *tp;
+	size_t slen, tlen;
 
-	for ( ; *s; ++s)
-	{
-		for (sp = s, tp = t; *tp && *tp == *sp; ++sp, ++tp)
-			;
-
-		if (*tp == *sp)
-			return TRUE;
-	}
-	return FALSE;
+	return (
+		*t == '\0' ||
+		(tlen=strlen(t)) > (slen=strlen(s)) ||
+		strcmp(s + (slen - tlen), t)
+	) ? 0 : 1;
 }

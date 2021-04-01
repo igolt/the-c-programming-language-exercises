@@ -2,7 +2,7 @@
 
 #define MAXLINE 100
 
-size_t get_line(char *, size_t);
+size_t getline(char *, size_t);
 
 int main(void)
 {
@@ -14,7 +14,7 @@ int main(void)
 	return 0;
 }
 
-size_t get_line(char *line, size_t max)
+size_t getline(char *line, size_t max)
 {
 	char *w, *end;
 

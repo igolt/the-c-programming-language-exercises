@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #define MAX 1000
 
@@ -41,17 +42,10 @@ char *mystrncpy(char *dest, const char *src, size_t n)
 
 char *mystrncat(char *dest, const char *src, size_t n)
 {
-	char *result = dest;
-	
 	/* if there is something to concat */
 	if (n && *src)
-	{
-		while (*dest)
-			++dest;
-
-		mystrncpy(dest, src, n);
-	}
-	return result;
+		mystrncpy(dest + strlen(dest), src, n);
+	return dest;
 }
 
 int mystrncmp(const char *s1, const char *s2, size_t n)
