@@ -1,0 +1,16 @@
+This is a line with different types of blank characters		
+and a new line.
+
+
+
+
+here is another line
+
+
+
+1000
+
+wc input.txt:
+	- lines: 16
+	- words: 30
+	- characters: 167
