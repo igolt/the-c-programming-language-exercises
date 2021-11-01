@@ -7,18 +7,20 @@
 
 unsigned setbits(unsigned, unsigned, unsigned, unsigned);
 
-int main()
+int
+main(void)
 {
-	unsigned x = 2049, p = 10, n = 10, y = 1023;
+  unsigned x = 2049, p = 10, n = 10, y = 1023;
 
-	printf("x: %u, p: %u, n: %u, y: %u\n", x, p, n, y);
-	printf("setbits: %u\n", setbits(x, p, n, y));
-	return 0;
+  printf("x: %u, p: %u, n: %u, y: %u\n", x, p, n, y);
+  printf("setbits: %u\n", setbits(x, p, n, y));
+  return 0;
 }
 
-unsigned setbits(unsigned x, unsigned p, unsigned n, unsigned y)
+unsigned
+setbits(unsigned x, unsigned p, unsigned n, unsigned y)
 {
-	unsigned mask = ~(~0 << n);
+  unsigned mask = ~(~0 << n);
 
   ++p;
   y = (y & mask) << (p - n);
@@ -26,4 +28,3 @@ unsigned setbits(unsigned x, unsigned p, unsigned n, unsigned y)
 
   return x | y;
 }
-

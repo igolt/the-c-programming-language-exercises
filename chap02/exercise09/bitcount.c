@@ -7,19 +7,21 @@
 
 int bitcount(unsigned);
 
-int main()
+int
+main(void)
 {
-	unsigned x;
+  unsigned x = 10;
 
-	printf("number of bits in %u: %d\n", x, bitcount(x));
-	return 0;
+  printf("number of bits in %u: %d\n", x, bitcount(x));
+  return 0;
 }
 
-int bitcount(unsigned x)
+int
+bitcount(unsigned x)
 {
-	int bits;
+  int bits;
 
-	for (bits = 0; x != 0; x &= (x - 1))
-		++bits;
-	return bits;
+  for (bits = 0; x != 0; x &= (x - 1))
+    ++bits;
+  return bits;
 }

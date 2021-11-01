@@ -1,8 +1,8 @@
-#ifndef ALLOC_H
-#define ALLOC_H
+#ifndef IGOLT_ALLOC_H
+#define IGOLT_ALLOC_H
 
 #include <stddef.h>
 
 void *alloc(size_t n);
 
-#endif /* ALLOC_H */
+#endif /* IGOLT_ALLOC_H */

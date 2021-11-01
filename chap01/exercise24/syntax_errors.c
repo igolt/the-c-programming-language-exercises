@@ -18,101 +18,84 @@
 #define TRUE  1
 #define FALSE 0
 
-int islinebreak(int c)
+int
+islinebreak(int c)
 {
-	return c == '\n' || c == '\v';
+  return c == '\n' || c == '\v';
 }
 
-int main()
+int
+main(void)
 {
-	const char *error = NULL;
-	int c, lastchar = EOF;
-	int instr = FALSE;
-	int inchar = FALSE;
-	int incomment = FALSE;
-	int escape = OFF;
-	int opbraces = 0;
-	int opbrackets = 0;
+  const char *error = NULL;
+  int c, lastchar = EOF;
+  int instr      = FALSE;
+  int inchar     = FALSE;
+  int incomment  = FALSE;
+  int escape     = OFF;
+  int opbraces   = 0;
+  int opbrackets = 0;
 
+  while (!error && (c = getchar()) != EOF) {
+    if (incomment) {
+      if (lastchar == '*' && c == '/') {
+        incomment = FALSE;
+        lastchar  = EOF;
+      } else
+        lastchar = c;
+    } else if (c == '\\')
+      escape = (escape == ON) ? OFF : ON;
+    else {
+      if (instr) {
+        if (islinebreak(c))
+          error = UNMATCHED_DOUBLE_QUOTES;
+        else if (c == '"' && escape == OFF)
+          instr = FALSE;
+      } else if (inchar) {
+        if (islinebreak(c))
+          error = UNMATCHED_SINGLE_QUOTES;
+        else if (c == '\'' && escape == OFF)
+          inchar = FALSE;
+      } else if (c == '"')
+        instr = TRUE;
+      else if (c == '\'')
+        inchar = TRUE;
+      else if (c == '{')
+        ++opbraces;
+      else if (c == '}') {
+        if (--opbraces < 0)
+          error = UNMATCHED_BRACES;
+      } else if (c == '(')
+        ++opbrackets;
+      else if (c == ')') {
+        if (--opbrackets < 0)
+          error = UNMATCHED_BRACKETS;
+      } else {
+        if (lastchar == '/' && c == '*') {
+          incomment = TRUE;
+          lastchar  = EOF;
+        } else
+          lastchar = c;
+      }
+      escape = OFF;
+    }
+  }
 
-	while (!error && (c=getchar()) != EOF)
-	{
-		if (incomment)
-		{
-			if (lastchar == '*' && c == '/')
-			{
-				incomment = FALSE;
-				lastchar = EOF;
-			}
-			else
-				lastchar = c;
-		}
-		else if (c == '\\')
-			escape = (escape == ON) ? OFF : ON;
-		else
-		{
-			if (instr)
-			{
-				if (islinebreak(c))
-					error = UNMATCHED_DOUBLE_QUOTES;
-				else if (c == '"' && escape == OFF)
-					instr = FALSE;
-			}
-			else if (inchar)
-			{
-				if (islinebreak(c))
-					error = UNMATCHED_SINGLE_QUOTES;
-				else if (c == '\'' && escape == OFF) 
-					inchar = FALSE;
-			}
-			else if (c == '"')
-				instr = TRUE;
-			else if (c == '\'')
-				inchar = TRUE;
-			else if (c == '{')
-				++opbraces;
-			else if (c == '}')
-			{
-				if (--opbraces < 0)
-					error = UNMATCHED_BRACES;
-			}
-			else if (c == '(')
-				++opbrackets;
-			else if (c == ')')
-			{
-				if (--opbrackets < 0)
-					error = UNMATCHED_BRACKETS;
-			}
-			else
-			{
-				if (lastchar == '/' && c == '*')
-				{
-					incomment = TRUE;
-					lastchar = EOF;
-				}
-				else
-					lastchar = c;
-			}
-			escape = OFF;
-		}
-	}
-
-	if (!error)
-	{
-		if (opbraces)
-			error = UNMATCHED_BRACES;
-		else if (opbrackets)
-			error = UNMATCHED_BRACKETS;
-		else if (incomment)
-			error = UNTERMINATED_COMMENT;
-		else if (instr)
-			error = UNMATCHED_DOUBLE_QUOTES;
-		else if (inchar)
-			error = UNMATCHED_SINGLE_QUOTES;
-	}
-	if (error)
-		printf("error: %s\n", error);
-	else
-		puts("De boas B)");
-	return 0;
+  if (!error) {
+    if (opbraces)
+      error = UNMATCHED_BRACES;
+    else if (opbrackets)
+      error = UNMATCHED_BRACKETS;
+    else if (incomment)
+      error = UNTERMINATED_COMMENT;
+    else if (instr)
+      error = UNMATCHED_DOUBLE_QUOTES;
+    else if (inchar)
+      error = UNMATCHED_SINGLE_QUOTES;
+  }
+  if (error)
+    printf("error: %s\n", error);
+  else
+    puts("De boas B)");
+  return 0;
 }

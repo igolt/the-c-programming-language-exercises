@@ -6,56 +6,43 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <cbook/iolib.h>
+
 #define MAXLINE 100
 
 char *reverse(char *);
-char *get_line(char *, size_t);
 
-int main()
+int
+main(void)
 {
-	char line[MAXLINE];
+  char line[MAXLINE];
 
-	while (get_line(line, MAXLINE))
-		printf("%s\n", reverse(line));
-	return 0;
+  while (getline(line, MAXLINE))
+    printf("%s\n", reverse(line));
+  return 0;
 }
 
-char *get_line(char *line, size_t max)
+void
+reverse_helper(char *left, char *right)
 {
-	int c;
-	char *it = line;
-
-	if (max == 0)
-		return NULL;
-
-	while (--max && (c=getchar()) != EOF && c != '\n')
-		*it++ = c;
-	*it = '\0';
-	return (it == line && c == EOF) ? NULL : line;
+  if (left < right) {
+    char temp = *left;
+    *left++ = *right;
+    *right-- = temp;
+    reverse_helper(left, right);
+  }
 }
 
-void reverse_helper(char *left, char *right)
+char *
+reverse(char *s)
 {
-	if (left < right)
-	{
-		char temp = *left;
-		*left++ = *right;
-		*right-- = temp;
-		reverse_helper(left, right);
-	}
+  /* if string length is greater than 1 */
+  if (*s != 0 && s[1] != 0) {
+    char *end;
+
+    for (end = s; *end; ++end)
+      ;
+    reverse_helper(s, end - 1);
+  }
+  return s;
 }
-
-char *reverse(char *s)
-{
-	/* if string length is greater than 1 */
-	if (*s != 0 && s[1] != 0)
-	{
-		char *end;
-
-		for (end = s; *end; ++end)
-			;
-		reverse_helper(s, end - 1);
-	}
-	return s;
-}
-

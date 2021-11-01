@@ -3,12 +3,13 @@
  */
 #include <stdio.h>
 
-int main()
+int
+main(void)
 {
-	int c;
+  int c;
 
-	do
-		printf("getchar() != EOF is %d\n", (c=getchar()) != EOF);
-	while (c != EOF);
-	return 0;
+  do
+    printf("getchar() != EOF is %d\n", (c = getchar()) != EOF);
+  while (c != EOF);
+  return 0;
 }

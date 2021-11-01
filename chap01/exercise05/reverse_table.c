@@ -6,18 +6,20 @@
 
 #define UPPER_LIMIT 300
 #define LOWER_LIMIT 0
-#define STEP 20
+#define STEP        20
 
-double fahr_to_cels(double fahrenheit)
+double
+fahr_to_cels(double fahrenheit)
 {
-	return (5.0/9) * (fahrenheit-32);
+  return (5.0 / 9) * (fahrenheit - 32);
 }
 
-int main()
+int
+main(void)
 {
-	double fahr;
+  double fahr;
 
-	for (fahr = UPPER_LIMIT; fahr >= LOWER_LIMIT; fahr -= STEP)
-		printf(" %3.0lf %6.1lf\n", fahr, fahr_to_cels(fahr));
-	return 0;
+  for (fahr = UPPER_LIMIT; fahr >= LOWER_LIMIT; fahr -= STEP)
+    printf(" %3.0f %6.1f\n", fahr, fahr_to_cels(fahr));
+  return 0;
 }

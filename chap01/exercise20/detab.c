@@ -8,32 +8,29 @@
 
 #define TABSTOP 8u
 
-int main()
+int
+main(void)
 {
-	int c;
-	unsigned int i;
-	unsigned int linelen;
-	unsigned int temp;
+  int c;
+  unsigned int i;
+  unsigned int linelen;
+  unsigned int temp;
 
-	linelen = 0;
-	while ((c=getchar()) != EOF)
-	{
-		if (c == '\t')
-		{
-			temp = TABSTOP - (linelen % TABSTOP);
-			linelen += temp;
-			for (i = 0; i < temp; ++i)
-				putchar('+');
-		}
-		else
-		{
-			putchar(c);
+  linelen = 0;
+  while ((c = getchar()) != EOF) {
+    if (c == '\t') {
+      temp = TABSTOP - (linelen % TABSTOP);
+      linelen += temp;
+      for (i = 0; i < temp; ++i)
+        putchar('+');
+    } else {
+      putchar(c);
 
-			if (c == '\n')
-				linelen = 0;
-			else
-				++linelen;
-		}
-	}
-	return 0;
+      if (c == '\n')
+        linelen = 0;
+      else
+        ++linelen;
+    }
+  }
+  return 0;
 }

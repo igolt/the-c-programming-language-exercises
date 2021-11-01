@@ -1,14 +1,21 @@
-#ifndef IO_LIB_H
-#define IO_LIB_H
+#ifndef IGOLT_IO_LIB_H
+#define IGOLT_IO_LIB_H
 
-int eprint(const char *s);
+#include <stdio.h>
 
-int eputs(const char *s);
+/* Convenient functions to write to stderr */
+#define eprint(s) fputs(s, stderr)
+#define eputs(s) fputs(s "\n", stderr)
+extern int eprintf(const char *fmt, ...);
 
-int eprintf(const char *fmt, ...);
+extern int getch(void);
 
-int getch(void);
+extern int ungetch(int c);
 
-int ungetch(int c);
+int fgetline(char *line, int max, FILE *stream);
+#define getline(line, max) fgetline(line, max, stdin)
 
-#endif /* IO_LIB_H */
+char *fgetword(char *word, int size, FILE *stream);
+#define getword(word, size) fgetword(word, size, stdin)
+
+#endif /* IGOLT_IO_LIB_H */

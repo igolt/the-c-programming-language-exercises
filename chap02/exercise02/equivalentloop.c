@@ -9,34 +9,35 @@
 #define TRUE  1
 #define FALSE 0
 
-int get_line(char *line, int lim)
+int
+get_line(char *line, int lim)
 {
-	int i = 0, c = EOF, isvalid = TRUE;
+  int i = 0, c = EOF, isvalid = TRUE;
 
-	/* for (i=0; i < lim - 1 && (c=getchar()) != '\n' && c != EOF; ++i) */
-	--lim;
-	while (isvalid)
-	{
-		if (i >= lim)
-			isvalid = FALSE;
-		else if ((c=getchar()) == EOF)
-			isvalid = FALSE;
-		else if (c == '\n')
-			isvalid = FALSE;
-		else
-			line[i++] = c;
-	}
-	if (c == '\n')
-		line[i++] = c;
-	line[i] = '\0';
-	return i;
+  /* for (i=0; i < lim - 1 && (c=getchar()) != '\n' && c != EOF; ++i) */
+  --lim;
+  while (isvalid) {
+    if (i >= lim)
+      isvalid = FALSE;
+    else if ((c = getchar()) == EOF)
+      isvalid = FALSE;
+    else if (c == '\n')
+      isvalid = FALSE;
+    else
+      line[i++] = c;
+  }
+  if (c == '\n')
+    line[i++] = c;
+  line[i] = '\0';
+  return i;
 }
 
-int main()
+int
+main(void)
 {
-	char line[MAXLINE];
+  char line[MAXLINE];
 
-	while (get_line(line, MAXLINE) > 0)
-		printf("%s", line);
-	return 0;
+  while (get_line(line, MAXLINE) > 0)
+    printf("%s", line);
+  return 0;
 }

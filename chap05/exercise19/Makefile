@@ -1,5 +1,5 @@
 CC = gcc
-CC_FLAGS = -W -Wall -ansi -pedantic
+CC_FLAGS = -ansi -pedantic
 
 LIB_DIR = ../../lib
 LIB_INC_DIR = $(LIB_DIR)/include

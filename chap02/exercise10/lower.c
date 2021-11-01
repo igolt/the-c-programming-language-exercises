@@ -4,44 +4,35 @@
  */
 #include <stdio.h>
 
+#include <cbook/iolib.h>
+
 #define MAXLINE 1000
 
-int get_line(char *, int);
 int lower(int);
 char *strtolower(char *);
 
-int main()
+int
+main()
 {
-	char line[MAXLINE];
+  char line[MAXLINE];
 
-	while (get_line(line, MAXLINE) > 0)
-		printf("%s", strtolower(line));
-	return 0;
+  while (getline(line, MAXLINE) > 0)
+    printf("%s", strtolower(line));
+  return 0;
 }
 
-int get_line(char *line, int max)
+int
+lower(int c)
 {
-	int i = 0, c = EOF;
-
-	--max;
-	while (i < max && (c=getchar()) != EOF && c != '\n')
-		line[i++] = c;
-	if (c == '\n')
-		line[i++] = c;
-	line[i] = '\0';
-	return i;
+  return (c >= 'A' && c <= 'Z') ? c + 'a' - 'A' : c;
 }
 
-int lower(int c)
+char *
+strtolower(char *s)
 {
-	return (c >= 'A' && c <= 'Z') ? c + 'a' - 'A' : c;
-}
+  int i;
 
-char *strtolower(char *s)
-{
-	int i;
-
-	for (i = 0; s[i]; ++i)
-		s[i] = lower(s[i]);
-	return s;
+  for (i = 0; s[i]; ++i)
+    s[i] = lower(s[i]);
+  return s;
 }

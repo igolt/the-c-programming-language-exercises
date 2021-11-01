@@ -4,10 +4,10 @@
  * pushed back, then implement your design.
  */
 
-#include <stdio.h>
 #include <assert.h>
+#include <stdio.h>
 
-#define SUCESS			 0
+#define SUCESS       0
 #define ERR_BUF_FULL 1
 #define ERR_EOF_PUSH 2
 
@@ -15,17 +15,18 @@ int ungetch(int);
 int getch(void);
 void fill_buf(void);
 
-int main(void)
+int
+main(void)
 {
-	assert(SUCESS == ungetch('a'));
-	assert(ERR_EOF_PUSH == ungetch(EOF));
-	assert('a' == getch());
+  assert(SUCESS == ungetch('a'));
+  assert(ERR_EOF_PUSH == ungetch(EOF));
+  assert('a' == getch());
 
-	fill_buf();
+  fill_buf();
 
-	assert(ERR_BUF_FULL == ungetch('a'));
+  assert(ERR_BUF_FULL == ungetch('a'));
 
-	return 0;
+  return 0;
 }
 
 #define BUFSIZE 100
@@ -36,23 +37,26 @@ size_t bufp = 0;
 #define BUF_FULL  (bufp == BUFSIZE)
 #define BUF_EMPTY (bufp == 0)
 
-int ungetch(int c)
+int
+ungetch(int c)
 {
-	if (c == EOF)
-		return ERR_EOF_PUSH;
-	if (BUF_FULL)
-		return ERR_BUF_FULL;
-	buf[bufp++] = c;
-	return SUCESS;
+  if (c == EOF)
+    return ERR_EOF_PUSH;
+  if (BUF_FULL)
+    return ERR_BUF_FULL;
+  buf[bufp++] = c;
+  return SUCESS;
 }
 
-int getch(void)
+int
+getch(void)
 {
-	return (BUF_EMPTY) ? getchar() : buf[--bufp];
+  return (BUF_EMPTY) ? getchar() : buf[--bufp];
 }
 
-void fill_buf(void)
+void
+fill_buf(void)
 {
-	while (!BUF_FULL)
-		ungetch('0');
+  while (!BUF_FULL)
+    ungetch('0');
 }

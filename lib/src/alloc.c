@@ -7,10 +7,11 @@ char *allocp = allocbuf;
 
 #define ALLOC_END (allocbuf + ALLOCSIZE)
 
-void *alloc(size_t n)
+void *
+alloc(size_t n)
 {
-	if (allocp + n > ALLOC_END)
-		return NULL;
-	allocp += n;
-	return (void *) (allocp - n);
+  if (allocp + n > ALLOC_END)
+    return NULL;
+  allocp += n;
+  return (void *) (allocp - n);
 }

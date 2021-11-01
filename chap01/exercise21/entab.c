@@ -8,40 +8,36 @@
 
 #define TABSTOP 8
 
-int main()
+int
+main(void)
 {
-	int c;
-	unsigned int totabstop;
-	unsigned int ns = 0;
-	unsigned int linelen = 0;
+  int c;
+  unsigned int totabstop;
+  unsigned int ns = 0;
+  unsigned int linelen = 0;
 
-	while ((c=getchar()) != EOF)
-	{
-		if (c == ' ')
-			++ns;
-		else
-		{
-			while (ns > 1 && ns >= (totabstop = TABSTOP - (linelen % TABSTOP)))
-			{
-				linelen += totabstop;
-				ns -= totabstop;
-				putchar('\t');
-			}
-			while (ns)
-			{
-				++linelen;
-				--ns;
-				putchar('*');
-			}
-			if (c == '\n')
-				linelen = 0;
-			else if (c == '\t')
-				linelen += (TABSTOP - (linelen % TABSTOP));
-			else
-				++linelen;
-			putchar(c);
-		}
-	}
-	return 0;
+  while ((c = getchar()) != EOF) {
+    if (c == ' ')
+      ++ns;
+    else {
+      while (ns > 1 && ns >= (totabstop = TABSTOP - (linelen % TABSTOP))) {
+        linelen += totabstop;
+        ns -= totabstop;
+        putchar('\t');
+      }
+      while (ns) {
+        ++linelen;
+        --ns;
+        putchar('*');
+      }
+      if (c == '\n')
+        linelen = 0;
+      else if (c == '\t')
+        linelen += (TABSTOP - (linelen % TABSTOP));
+      else
+        ++linelen;
+      putchar(c);
+    }
+  }
+  return 0;
 }
-

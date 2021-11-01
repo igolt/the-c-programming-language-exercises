@@ -8,43 +8,46 @@
 #define ARRAY_SIZE (sizeof(array) / sizeof(*array))
 
 int binsearch(int, int[], int);
-void printarray(int [], int);
+void printarray(int[], int);
 
-int main()
+int
+main(void)
 {
-	int array[] = { 10, 41, 57, 82, 102, 201, 220, 314, 333, 345, 444, 567, 1021, 2000 };
-	int val = 1500;
+  int array[] = {10,  41,  57,  82,  102, 201,  220,
+                 314, 333, 345, 444, 567, 1021, 2000};
+  int val = 1500;
 
-	printf("Array size: %lu\n", ARRAY_SIZE);
-	printarray(array, ARRAY_SIZE);
-	printf("Searching for value %d\n", val, binsearch(val, array, ARRAY_SIZE));
-	return 0;
- }
-
-int binsearch(int val, int v[], int size)
-{
-	int low, mid, high;
-
-	low = 0;
-	high = size - 1;
-	mid = (low + high) / 2;
-
-	while (low <= high && val != v[mid])
-	{
-		if (val < v[mid])
-			high = mid - 1;
-		else
-			low = mid + 1;
-		
-		mid = (low + high) / 2;
-	}
-	return (val == v[mid]) ? mid : -1;
+  printf("Array size: %lu\n", ARRAY_SIZE);
+  printarray(array, ARRAY_SIZE);
+  printf("Searching for value %d, %d\n", val, binsearch(val, array, ARRAY_SIZE));
+  return 0;
 }
 
-void printarray(int array[], int size)
+int
+binsearch(int val, int v[], int size)
 {
-	int i;
+  int low, mid, high;
 
-	for (i = 0; i < size; ++i)
-		printf("%d%c", array[i], (i == size - 1) ? '\n' : ' ');
+  low = 0;
+  high = size - 1;
+  mid = (low + high) / 2;
+
+  while (low <= high && val != v[mid]) {
+    if (val < v[mid])
+      high = mid - 1;
+    else
+      low = mid + 1;
+
+    mid = (low + high) / 2;
+  }
+  return (val == v[mid]) ? mid : -1;
+}
+
+void
+printarray(int array[], int size)
+{
+  int i;
+
+  for (i = 0; i < size; ++i)
+    printf("%d%c", array[i], (i == size - 1) ? '\n' : ' ');
 }

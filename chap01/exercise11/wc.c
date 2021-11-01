@@ -13,23 +13,23 @@
 int
 main(void)
 {
-    int c, state;
-    unsigned nl, nw, nc;
+  int c, state;
+  unsigned nl, nw, nc;
 
-    state = OUT;
-    nl = nw = nc = 0;
+  state = OUT;
+  nl = nw = nc = 0;
 
-    while ((c = getchar()) != EOF) {
-        ++nc;
+  while ((c = getchar()) != EOF) {
+    ++nc;
 
-        if (c == '\n')
-            ++nl;
+    if (c == '\n')
+      ++nl;
 
-        if (c == ' ' || c == '\n' || c == '\t')
-            state = OUT;
-        else if (state == OUT)
-            state = IN, ++nw;
-    }
-    printf("lines: %u, words: %u, characters: %u\n", nl, nw, nc);
-    return 0;
+    if (c == ' ' || c == '\n' || c == '\t')
+      state = OUT;
+    else if (state == OUT)
+      state = IN, ++nw;
+  }
+  printf("lines: %u, words: %u, characters: %u\n", nl, nw, nc);
+  return 0;
 }

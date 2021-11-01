@@ -5,19 +5,25 @@
 
 #include <stdio.h>
 
-#define swap(t, x, y) { t __temp__ = (x); (x) = (y); (y) = __temp__; }
+#define swap(t, x, y)                                                          \
+  do {                                                                         \
+    t __temp__ = (x);                                                          \
+    (x) = (y);                                                                 \
+    (y) = __temp__;                                                            \
+  } while (0)
 
-int main(void)
+int
+main(void)
 {
-	int x = 10, y = 20;
-	double z = 29.4, w = 41.342;
+  int x = 10, y = 20;
+  double z = 29.4, w = 41.342;
 
-	printf("x: %d, x: %d\n", x, y);
-	swap(int, x, y);
-	printf("x: %d, x: %d\n\n", x, y);
+  printf("x: %d, x: %d\n", x, y);
+  swap(int, x, y);
+  printf("x: %d, x: %d\n\n", x, y);
 
-	printf("z: %g, w: %g\n", z, w);
-	swap(double, z, w);
-	printf("z: %g, w: %g\n", z, w);
-	return 0;
+  printf("z: %g, w: %g\n", z, w);
+  swap(double, z, w);
+  printf("z: %g, w: %g\n", z, w);
+  return 0;
 }

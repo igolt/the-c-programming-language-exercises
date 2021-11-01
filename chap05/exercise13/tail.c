@@ -10,13 +10,16 @@
  * not in a two-dimensional array of fixed size.
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+
+#include <cbook/iolib.h>
+#include <cbook/strlib.h>
 
 #define bool signed char
-#define true  1
+#define true 1
 #define false 0
 
 #define MAX_LINE 1000
@@ -27,130 +30,108 @@
 #define ERR_INVAL_ARG   2
 #define ERR_ALLOC       3
 
-#define TAIL_INIT() \
-	tail = malloc(sizeof(*tail) * nlines), pos = 0;
+#define TAIL_INIT()                                                            \
+  do {                                                                         \
+    tail = malloc(sizeof(*tail) * nlines);                                     \
+    pos = 0;                                                                   \
+  } while (0)
 
-#define TAIL_PUSH(__line)                                    \
-	do                                                       \
-	{                                                        \
-		if (pos == nlines)                                   \
-		{                                                    \
-			pos = 0;                                         \
-			rewrite = true;                                  \
-		}                                                    \
-		if (rewrite)                                         \
-		{                                                    \
-			size_t linelen = strlen(__line);                 \
-                                                             \
-			if (linelen > strlen(tail[pos]))                 \
-				tail[pos] = realloc(tail[pos], linelen + 1); \
-			strcpy(tail[pos], __line);                       \
-		}                                                    \
-		else                                                 \
-			tail[pos] = strdup(__line);                      \
-		++pos;                                               \
-	} while (0)
+#define TAIL_PUSH(__line)                                                      \
+  do {                                                                         \
+    if (pos == nlines) {                                                       \
+      pos = 0;                                                                 \
+      rewrite = true;                                                          \
+    }                                                                          \
+    if (rewrite) {                                                             \
+      size_t linelen = strlen(__line);                                         \
+                                                                               \
+      if (linelen > strlen(tail[pos]))                                         \
+        tail[pos] = realloc(tail[pos], linelen + 1);                           \
+      strcpy(tail[pos], __line);                                               \
+    } else                                                                     \
+      tail[pos] = strdup(__line);                                              \
+    ++pos;                                                                     \
+  } while (0)
 
-#define TAIL_PRINT_N_FREE()                       \
-	do                                            \
-	{                                             \
-		long int count;                           \
-		                                          \
-		if (rewrite)                              \
-		{                                         \
-			count = pos;                          \
-                                                  \
-			do                                    \
-			{                                     \
-				printf("%s", tail[count]);        \
-				free(tail[count]);                \
-				count = (count + 1) % nlines;     \
-			} while (count != pos);               \
-		}                                         \
-		else                                      \
-		{                                         \
-			for (count = 0; count < pos; ++count) \
-			{                                     \
-				printf("%s", tail[count]);        \
-				free(tail[count]);                \
-			}                                     \
-		}                                         \
-                                                  \
-		free(tail);                               \
-	} while (0)
+#define TAIL_PRINT_N_FREE()                                                    \
+  do {                                                                         \
+    long int count;                                                            \
+                                                                               \
+    if (rewrite) {                                                             \
+      count = pos;                                                             \
+                                                                               \
+      do {                                                                     \
+        printf("%s", tail[count]);                                             \
+        free(tail[count]);                                                     \
+        count = (count + 1) % nlines;                                          \
+      } while (count != pos);                                                  \
+    } else {                                                                   \
+      for (count = 0; count < pos; ++count) {                                  \
+        printf("%s", tail[count]);                                             \
+        free(tail[count]);                                                     \
+      }                                                                        \
+    }                                                                          \
+                                                                               \
+    free(tail);                                                                \
+  } while (0)
 
 const char *progname;
 long int nlines;
 
 void process_args(int argc, char *argv[]);
-char *strdup(const char *s);
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-	char line[MAX_LINE];
-	char **tail;
-	bool rewrite = false;
-	long int pos;
+  char line[MAX_LINE];
+  char **tail;
+  bool rewrite = false;
+  long int pos;
 
-	process_args(argc, argv);
+  process_args(argc, argv);
 
-	if (nlines == 0)
-		return 0;
+  if (nlines == 0)
+    return 0;
 
-	TAIL_INIT();
+  TAIL_INIT();
 
-	while (fgets(line, MAX_LINE, stdin))
-		TAIL_PUSH(line);
+  while (fgets(line, MAX_LINE, stdin))
+    TAIL_PUSH(line);
 
-	TAIL_PRINT_N_FREE();
-	return 0;
+  TAIL_PRINT_N_FREE();
+  return 0;
 }
 
-char *strdup(const char *s)
+void
+process_args(int argc, char *argv[])
 {
-	char *cpy;
+  extern long int nlines;
+  extern const char *progname;
 
-	cpy = (char *) malloc(strlen(s) + 1);
-	if (cpy == NULL)
-		return NULL;
-	return strcpy(cpy, s);
-}
+  assert(argc > 0);
+  assert(argv != NULL);
 
-void process_args(int argc, char *argv[])
-{
-	extern long int nlines;
-	extern const char *progname;
+  progname = *argv;
 
-	assert(argc > 0);
-	assert(argv != NULL);
+  if (argc < 2)
+    nlines = DEFAULT_N_LINES;
+  else {
+    while (--argc > 0) {
+      const char *arg = *++argv;
 
-	progname = *argv;
+      if (*arg != '-') {
+        eprintf("Usage: %s [-NLINES]\n", progname);
+        exit(ERR_INVAL_USAGE);
+      } else {
+        char *saveptr;
 
-	if (argc < 2)
-		nlines = DEFAULT_N_LINES;
-	else
-	{
-		while (--argc > 0)
-		{
-			const char *arg = *++argv;
+        nlines = strtol(++arg, &saveptr, 10);
 
-			if (*arg != '-')
-			{
-				fprintf(stderr, "Usage: %s [-NLINES]\n", progname);
-				exit(ERR_INVAL_USAGE);
-			}
-			else
-			{
-				char *saveptr;
-
-				nlines = strtol(++arg, &saveptr, 10);
-
-				if (*saveptr || nlines < 0)
-				{
-					fprintf(stderr, "%s: invalid argument `%s`\n", progname, arg);
-					exit(ERR_INVAL_ARG);
-				}
-			}
-		}
-	}
+        if (*saveptr || nlines < 0) {
+          eprintf("%s: invalid argument `%s`\n", progname, arg);
+          exit(ERR_INVAL_ARG);
+        }
+      }
+    }
+  }
 }

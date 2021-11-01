@@ -7,11 +7,11 @@
  * evaluates 2 * (3+4).
  */
 
-#include <math.h>
-#include <stdio.h>
 #include <ctype.h>
-#include <stdlib.h>
+#include <math.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define ERR_NO_ARGS  1
 #define ERR_ZERO_DIV 2
@@ -31,93 +31,76 @@ size_t stack_size(void);
 int stack_push(double);
 double stack_pop(void);
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-	const char *progname = *argv;
-	double op2;
+  const char *progname = *argv;
+  double op2;
 
-	if (argc < 2)
-	{
-		fprintf(stderr, "Usage: %s POLISH-EXPR\n", progname);
-		exit(ERR_NO_ARGS);
-	}
+  if (argc < 2) {
+    eprintf("Usage: %s POLISH-EXPR\n", progname);
+    exit(ERR_NO_ARGS);
+  }
 
-	while (--argc)
-	{
-		switch (eval_arg(*++argv))
-		{
-			case NUM:
-				stack_push(atof(*argv));
-				break;
+  while (--argc) {
+    switch (eval_arg(*++argv)) {
+      case NUM:
+        stack_push(atof(*argv));
+        break;
 
-			case '+':
-				stack_push(stack_pop() + stack_pop());
-				break;
+      case '+':
+        stack_push(stack_pop() + stack_pop());
+        break;
 
-			case '*':
-				stack_push(stack_pop() * stack_pop());
-				break;
+      case '*':
+        stack_push(stack_pop() * stack_pop());
+        break;
 
-			case '-':
-				op2 = stack_pop();
-				stack_push(stack_pop() - op2);
-				break;
+      case '-':
+        op2 = stack_pop();
+        stack_push(stack_pop() - op2);
+        break;
 
-			case '/':
-				op2 = stack_pop();
+      case '/':
+        op2 = stack_pop();
 
-				if (op2 != 0.0)
-				{
-					eprintf("%s: zero divisor\n", progname);
-					exit(ERR_ZERO_DIV);
-				}
-				break;
+        if (op2 != 0.0) {
+          eprintf("%s: zero divisor\n", progname);
+          exit(ERR_ZERO_DIV);
+        }
+        break;
 
-			case '%':
-				op2 = stack_pop();
-				stack_push(fmod(stack_pop(), op2));
-				break;
+      case '%':
+        op2 = stack_pop();
+        stack_push(fmod(stack_pop(), op2));
+        break;
 
-			default:
-				eprintf("%s: invalid argumet `%s'\n", progname, *argv);
-				exit(ERR_SYNTAX);
-		}
-	}
-	printf("%g\n", stack_pop());
-	printf("stack size: %lu\n", stack_size());
-	return 0;
+      default:
+        eprintf("%s: invalid argumet `%s'\n", progname, *argv);
+        exit(ERR_SYNTAX);
+    }
+  }
+  printf("%g\n", stack_pop());
+  printf("stack size: %lu\n", stack_size());
+  return 0;
 }
 
-int eprintf(const char *fmt, ...)
+int
+eval_arg(const char *arg)
 {
-	va_list ap;
-	int done;
+  while (isspace(*arg))
+    ++arg;
 
-	fputs("error: ", stderr);
+  if (!isdigit(*arg)) {
+    if (!(*arg == '+' || *arg == '-' || *arg == '.'))
+      return *arg;
 
-	va_start(ap, fmt);
-	done = vfprintf(stderr, fmt, ap);
-	va_end(ap);
+    ++arg;
 
-	return done;
-}
-
-int eval_arg(const char *arg)
-{
-	while (isspace(*arg))
-		++arg;
-
-	if (!isdigit(*arg))
-	{
-		if (!(*arg == '+' || *arg == '-' || *arg == '.'))
-			return *arg;
-
-		++arg;
-
-		if (!isdigit(*arg))
-			return *--arg;
-	}
-	return NUM;
+    if (!isdigit(*arg))
+      return *--arg;
+  }
+  return NUM;
 }
 
 #define STACK_MAX 1000
@@ -130,25 +113,27 @@ double *stackp = stack;
 #define STACK_IS_EMPTY (stackp == stack)
 #define STACK_IS_FULL  (stackp == STACK_END)
 
-int stack_push(double val)
+int
+stack_push(double val)
 {
-	if (STACK_IS_FULL)
-		return STACK_FULL;
-	*stackp++ = val;
-	return 0;
+  if (STACK_IS_FULL)
+    return STACK_FULL;
+  *stackp++ = val;
+  return 0;
 }
 
-size_t stack_size(void)
+size_t
+stack_size(void)
 {
-	return (stackp - stack);
+  return (stackp - stack);
 }
 
-double stack_pop(void)
+double
+stack_pop(void)
 {
-	if (STACK_IS_EMPTY)
-	{
-		eputs("stack_pop: stack is empty");
-		return 0.0;
-	}
-	return *--stackp;
+  if (STACK_IS_EMPTY) {
+    eputs("stack_pop: stack is empty");
+    return 0.0;
+  }
+  return *--stackp;
 }

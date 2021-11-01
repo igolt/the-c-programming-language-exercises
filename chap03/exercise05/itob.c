@@ -11,52 +11,54 @@ int myabs(int);
 char *reverse(char *);
 char *itob(int, char *, int);
 
-int main()
+int
+main(void)
 {
-	int base = 8, num = 9;
-	char result[30];
+  int base = 8, num = 9;
+  char result[30];
 
-	printf("Num: %d\n", num);
-	printf("Base: %d\n", base);
-	printf("itob: %s\n", itob(num, result, base));
-	return 0;
+  printf("Num: %d\n", num);
+  printf("Base: %d\n", base);
+  printf("itob: %s\n", itob(num, result, base));
+  return 0;
 }
 
-int myabs(int num)
+int
+myabs(int num)
 {
-	return (num < 0) ? (num * (-1)) : num;
+  return (num < 0) ? (num * (-1)) : num;
 }
 
-char *reverse(char *s)
+char *
+reverse(char *s)
 {
-	int i, j;
-	char temp;
+  int i, j;
+  char temp;
 
-	for (i = 0, j = strlen(s) - 1; i < j; ++i, --j)
-	{
-		temp = s[i];
-		s[i] = s[j];
-		s[j] = temp;
-	}
-	return s;
+  for (i = 0, j = strlen(s) - 1; i < j; ++i, --j) {
+    temp = s[i];
+    s[i] = s[j];
+    s[j] = temp;
+  }
+  return s;
 }
 
-char *itob(int n, char *s, int b)
+char *
+itob(int n, char *s, int b)
 {
-	int i, temp;
-	char sign;
+  int i, temp;
+  char sign;
 
-	sign = (n < 0) ? '-' : '+';
+  sign = (n < 0) ? '-' : '+';
 
-	i = 0;
-	do
-	{
-		temp = myabs(n % b);
-		s[i++] = (temp > 10) ? (temp + 'a' - 10) : temp + '0';
-	} while ((n /= b));
+  i = 0;
+  do {
+    temp = myabs(n % b);
+    s[i++] = (temp > 10) ? (temp + 'a' - 10) : temp + '0';
+  } while ((n /= b));
 
-	if (sign == '-')
-		s[i++] = '-';
-	s[i] = '\0';
-	return reverse(s);
+  if (sign == '-')
+    s[i++] = '-';
+  s[i] = '\0';
+  return reverse(s);
 }

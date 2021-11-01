@@ -6,55 +6,44 @@
  */
 #include <stdio.h>
 
-#define TRUE  1
-#define FALSE 0
+#include <cbook/iolib.h>
 
 #define MAXLINE 1000
 
 int any(const char *, const char *);
-int get_line(char *, int);
 
-int main()
+int
+main(void)
 {
-	char s1[MAXLINE], s2[MAXLINE];
-	int location;
+  char s1[MAXLINE], s2[MAXLINE];
+  int location;
 
-	while (get_line(s1, MAXLINE) >= 0 && get_line(s2, MAXLINE) >= 0)
-	{
-		printf("s1: \"%s\"\n", s1);
-		printf("s2: \"%s\"\n", s2);
-		printf("Location: %d\n", (location=any(s1, s2)));
-		if (location > 0)
-			printf("s1[%d] = '%c'\n", location, s1[location]);
-	}
-	return 0;
+  while (getline(s1, MAXLINE) >= 0 && getline(s2, MAXLINE) >= 0) {
+    printf("s1: \"%s\"\n", s1);
+    printf("s2: \"%s\"\n", s2);
+    printf("Location: %d\n", (location = any(s1, s2)));
+    if (location > 0)
+      printf("s1[%d] = '%c'\n", location, s1[location]);
+  }
+  return 0;
 }
 
-int mystrchr(const char *s, int c)
+int
+mystrchr(const char *s, int c)
 {
-	while (*s)
-		if (*s++ == c)
-			return TRUE;
-	return FALSE;
+  while (*s)
+    if (*s++ == c)
+      return 1;
+  return 0;
 }
 
-int any(const char *s1, const char *s2)
+int
+any(const char *s1, const char *s2)
 {
-	int i;
+  int i;
 
-	for (i = 0; s1[i]; ++i)
-		if (mystrchr(s2, s1[i]))
-			return i;
-	return -1;
-}
-
-int get_line(char *line, int lim)
-{
-	int i = 0, c = '\0';
-
-	--lim;
-	while (i < lim && (c=getchar()) != EOF && c != '\n')
-		line[i++] = c;
-	line[i] = '\0';
-	return (c == EOF && i == 0) ? -1 : i;
+  for (i = 0; s1[i]; ++i)
+    if (mystrchr(s2, s1[i]))
+      return i;
+  return -1;
 }
