@@ -1,0 +1,14 @@
+char *argv
+int (*daytab)[13]
+int *daytab[13]
+void *comp()
+void (*comp)()
+char (*(*x())[])()
+char (*(*x[3])())[5]
+const char *argv
+const char **argv
+char c
+int i
+char *strcpy(char *dest, const char *source)
+void qsort (void *__base, size_t __nmemb, size_t __size, int (*__compar_fn_t) (const void *, const void *))
+n const int

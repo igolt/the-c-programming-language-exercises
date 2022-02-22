@@ -5,66 +5,51 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "gettoken.h"
-/* #include "iolib.h" */
+#include <cbook/iolib.h>
 
-enum { SUCESS = 0, SYNTAX_ERROR, UNEXPECTED_TOKEN, MISSING_PAREN };
+#define MAXTOKEN 100
 
-const char *error_msgs[] = {
-  "No error",
-  "syntax error",
-  "expected name or (dcl)",
-  "missing )"
-};
+enum { NAME, PARENS, BRACKETS };
 
-int dcl(void);
-int dirdcl(void);
-void clear_err(void);
+static void dcl(void);
+static void dirdcl(void);
 
-char name[MAXTOKEN];     /* identifier name */
-char datatype[MAXTOKEN]; /* data type = char, int, etc. */
-char out[1000];
+static int gettoken(void);
+
+static int tokentype;
+static char token[MAXTOKEN];
+static char name[MAXTOKEN];
+static char datatype[MAXTOKEN];
+static char out[1000];
 
 int
 main(void)
 {
   while (gettoken() != EOF) {
-    int status;
-
     strcpy(datatype, token);
     out[0] = '\0';
-    status = dcl();
-
-    if (status == SUCESS && tokentype != '\n')
-      status = SYNTAX_ERROR;
-    if (status == SUCESS)
-      printf("%s: %s %s\n", name, out, datatype);
-    else {
-      eprintf("%s\n", error_msgs[status]);
-      clear_err();
-    }
+    dcl();
+    if (tokentype != '\n')
+      eputs("syntax error");
+    printf("%s: %s %s\n", name, out, datatype);
   }
   return 0;
 }
 
-int
+static void
 dcl(void)
 {
   int ns;
-  int status;
 
-  for (ns = 0; gettoken() == '*';)
-    ++ns;
+  for (ns = 0; gettoken() == '*'; ++ns)
+    continue;
 
-  status = dirdcl();
-  if (status != SUCESS)
-    return status;
+  dirdcl();
   while (ns-- > 0)
     strcat(out, " pointer to");
-  return SUCESS;
 }
 
-int
+static void
 dirdcl(void)
 {
   int type;
@@ -72,11 +57,11 @@ dirdcl(void)
   if (tokentype == '(') {
     dcl();
     if (tokentype != ')')
-      return MISSING_PAREN;
+      eputs("error: missing )");
   } else if (tokentype == NAME)
     strcpy(name, token);
   else
-    return UNEXPECTED_TOKEN;
+    eputs("error: expected name or (dcl)");
 
   while ((type = gettoken()) == PARENS || type == BRACKETS) {
     if (type == PARENS)
@@ -87,12 +72,36 @@ dirdcl(void)
       strcat(out, " of");
     }
   }
-  return SUCESS;
 }
 
-void
-clear_err(void)
+static int
+gettoken(void)
 {
-  while (tokentype != '\n' && tokentype != EOF)
-    gettoken();
+  int c;
+  char *p = token;
+
+  while ((c = getch()) == ' ' || c == '\t')
+    continue;
+  if (c == '(') {
+    if ((c = getch()) == ')') {
+      strcpy(token, "()");
+      return tokentype = PARENS;
+    } else {
+      ungetch(c);
+      return tokentype = '(';
+    }
+  } else if (c == '[') {
+    *p++ = c;
+    while ((*p++ = getch()) != ']')
+      continue;
+    *p = '\0';
+    return tokentype = BRACKETS;
+  } else if (isalpha(c)) {
+    for (*p++ = c; isalnum(c = getch()); )
+      *p++ = c;
+    *p = '\0';
+    ungetch(c);
+    return tokentype = NAME;
+  }
+  return tokentype = c;
 }

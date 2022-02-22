@@ -6,136 +6,235 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAXTOKEN 1000
+#include <stdlib.h>
 
-typedef int bool;
+#include <cbook/iolib.h>
+#include <cbook/utils.h>
+#include <cbook/strlib.h>
+
+#define MAXTOKEN 100
 
 enum { NAME, PARENS, BRACKETS };
 
-char identifier[MAXTOKEN];
-char datatype[MAXTOKEN];
-char token[MAXTOKEN];
-char out[1000];
-int tokentype;
+static char out[1000];
+static char name[MAXTOKEN];
+static char datatype[MAXTOKEN];
 
-int gettoken(void);
-void declaration(void);
-void declarator(void);
-void direct_declarator(void);
-void pointer_handler(void);
+static char token[MAXTOKEN];
+static int  cachetoken = 0;
+static int  tokentype  = 0;
 
-int
-gettoken(void)
-{
-  extern char token[];
-  extern int tokentype;
-  char *p = token;
-  int c;
+static int  gettoken(void);
+#define ungettoken() (cachetoken = 1)
 
-  while ((c = getchar()) == ' ' || c == '\t') {
-    /* Jump white spaces bruh */;
-  }
-
-  if (c == '(') {
-    if ((c = getchar()) == ')') {
-      strcpy(token, "()");
-      return tokentype = PARENS;
-    }
-    ungetc(c, stdin);
-    return tokentype = '(';
-  } else if (c == '[') {
-    for (*p++ = c; (*p++ = getchar()) != ']';)
-      ;
-    *p = '\0';
-    return tokentype = BRACKETS;
-  } else if (c == '_' || isalpha(c)) {
-    for (*p++ = c; (c = getchar()) == '_' || isalnum(c);)
-      *p++ = c;
-    *p = '\0';
-    ungetc(c, stdin);
-    return tokentype = NAME;
-  }
-  return tokentype = c;
-}
-
-void
-declaration(void)
-{
-  while (gettoken() != EOF) {
-    strcpy(datatype, token);
-    out[0] = '\0';
-    declarator();
-    if (tokentype != '\n') {
-      /* error */
-    }
-    printf("%s:%s %s\n", identifier, out, datatype);
-  }
-}
-
-void
-declarator(void)
-{
-  if (gettoken() == '*') {
-    pointer_handler();
-  }
-  direct_declarator();
-}
-
-void
-direct_declarator(void)
-{
-  int type;
-
-  if (tokentype == '(') {
-    declarator();
-    if (tokentype != ')') {
-      /* error */
-    }
-  } else if (tokentype == NAME) {
-    strcpy(identifier, token);
-  } else {
-    /* error */
-  }
-
-  while ((type = gettoken()) == PARENS || type == BRACKETS) {
-    if (type == PARENS) {
-      strcat(out, " function returning");
-    } else {
-      strcat(out, " array");
-      strcat(out, token);
-      strcat(out, " of");
-    }
-  }
-}
-
-void
-pointer_handler(void)
-{
-  char tmp_buf[22];
-  bool is_const;
-  bool is_volatile;
-
-  while (tokentype == '*') {
-    is_volatile = is_const = 0;
-
-    while (gettoken() == NAME) {
-      if (strcmp(token, "const") == 0) {
-        is_const = 1;
-      } else if (strcmp(token, "volatile") == 0) {
-        is_volatile = 1;
-      } else {
-        break;
-      }
-    }
-    sprintf(tmp_buf, " %s%spointer to", is_const ? "constant " : "",
-            is_volatile ? "volatile " : "");
-    strcat(out, tmp_buf);
-  }
-}
+static int dcl(void);
+static int dirdcl(void);
+static int dcl_specifiers(char *);
 
 int
 main(void)
 {
-  declaration();
+  extern int tokentype;
+
+  while (gettoken() != EOF) {
+    out[0] = name[0] = datatype[0] = '\0';
+
+    ungettoken();
+
+    if (dcl_specifiers(datatype))
+      break;
+
+    dcl();
+    if (tokentype != '\n') {
+      eputs("syntax error");
+      break;
+    }
+    printf("%s:%s%s\n", name, out, datatype);
+  }
+  return 0;
+}
+
+static int
+gettoken(void)
+{
+  extern int cachetoken;
+  extern char token[];
+  int c;
+  char *wp = token;
+
+  if (cachetoken) {
+    cachetoken = 0;
+    return tokentype;
+  }
+
+  while ((c = getch()) == ' ' || c == '\t')
+    continue;
+
+  if (c == '(') {
+    if ((c = getch()) == ')') {
+      strcpy(token, "()");
+      return tokentype = PARENS;
+    }
+    if (c != EOF)
+      ungetch(c);
+
+    token[0] = '(';
+    token[1] = '\0';
+
+    return tokentype = '(';
+  }
+
+  if (c == '[') {
+    for (*wp++ = c; (c = getch()) != EOF;)
+      if ((*wp++ = c) == ']')
+        break;
+    *wp              = '\0';
+    return tokentype = (c == ']') ? BRACKETS : *--wp;
+  }
+
+  if (isalpha(c) || c == '_') {
+    do {
+      *wp++ = c;
+    } while (isalnum(c = getch()) || c == '_');
+    *wp = '\0';
+    if (c != EOF)
+      ungetch(c);
+    return tokentype = NAME;
+  }
+  token[0] = c;
+  token[1] = '\0';
+
+  return tokentype = c;
+}
+
+/* Test if token is a type qualifiers or a storage class */
+static int
+issctq(const char *token)
+{
+  static const char *const storaclass_typequalifies[] = {
+    "auto",
+    "const",
+    "extern",
+    "register",
+    "static",
+    "volatile"
+  };
+  size_t high = ARRAYSIZE(storaclass_typequalifies);
+  size_t low  = 0, mid;
+
+  while (high > low) {
+    int cmp;
+    mid = (low + high) / 2;
+
+    cmp = strcmp(token, storaclass_typequalifies[mid]);
+
+    if (cmp == 0) {
+      return 1;
+    } else if (cmp > 0) {
+      low = mid + 1;
+    } else {
+      high = mid;
+    }
+  }
+
+  return 0;
+}
+
+static int
+dcl(void)
+{
+  extern char out[];
+  unsigned ns;
+
+  for (ns = 0; gettoken() == '*'; ++ns)
+    continue;
+
+  if (dirdcl())
+    return 1;
+
+  while (ns) {
+    strcat(out, " pointer to");
+    --ns;
+  }
+  return 0;
+}
+
+static int
+dirdcl(void)
+{
+  extern int  tokentype;
+  extern char out[];
+  char temp[100];
+
+  if (tokentype == '(') {
+    dcl();
+    if (tokentype != ')') {
+      eputs("error: missing )");
+      return 1;
+    }
+  } else if (tokentype == NAME) {
+    if (strempty(name))
+      strcpy(name, token);
+  } else {
+    eputs("error: expected name or (dcl)");
+    return 1;
+  }
+
+  while (1) {
+    gettoken();
+
+    if (tokentype == PARENS) {
+      strcat(out, " function returning");
+    } else if (tokentype == BRACKETS) {
+      strcat(out, " array");
+      strcat(out, token);
+      strcat(out, " of");
+    } else if (tokentype == '(') {
+      strcat(out, " function receiving");
+      while (1) {
+        temp[0] = '\0';
+        dcl_specifiers(temp);
+        dcl();
+        strcat(out, temp);
+        if (tokentype != ',') {
+          break;
+        }
+        strcat(out, ",");
+      }
+      if (tokentype != ')') {
+        eputs("error: expected )");
+      }
+      strcat(out, " and returning");
+    } else {
+      break;
+    }
+  }
+  return 0;
+}
+
+static int
+dcl_specifiers(char *dest)
+{
+  unsigned tokens;
+  int found_datatype = 0;
+
+  for (tokens = 0; gettoken() != EOF; ++tokens) {
+    if (tokentype != NAME) {
+      break;
+    } else {
+      /* Test if token is a type-specifier */
+      if (!issctq(token)) {
+        if (found_datatype) break;
+        found_datatype = 1;
+      }
+      strcat(dest, " ");
+      strcat(dest, token);
+    }
+  }
+  if (tokens == 0) {
+    eputs("Error: expected qualifiers or type-specifier");
+    return 1;
+  }
+  ungettoken();
   return 0;
 }
