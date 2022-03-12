@@ -5,8 +5,6 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#include <cbook/utils.h>
-
 int
 main(void)
 {
@@ -14,7 +12,7 @@ main(void)
   unsigned line = 1;
 
   while ((c = getchar()) != EOF) {
-    if (isblank(c) || c == '\n') {
+    if (isspace(c)) {
       if (last_out != '\n')
         putchar((last_out = '\n'));
     } else {

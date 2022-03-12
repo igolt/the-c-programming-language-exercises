@@ -1,10 +1,7 @@
 #ifndef IGOLT_UTILS
 #define IGOLT_UTILS
 
-static int isblank(int c)
-{
-  return c == ' ' || c == '\n' || c == '\t';
-}
+int isblank(int);
 
 #define SWAP(type, a, b)                                                       \
   do {                                                                         \
@@ -15,5 +12,7 @@ static int isblank(int c)
     (*__a_ptr) = (*__b_ptr);                                                   \
     (*__b_ptr) = __tmp;                                                        \
   } while (0)
+
+#define ARRAYSIZE(arr) (sizeof(arr) / sizeof(arr[0]))
 
 #endif /* IGOLT_UTILS */

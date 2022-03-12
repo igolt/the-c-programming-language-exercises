@@ -4,7 +4,6 @@
  * column of input. Make sure your program does something intelligent with very
  * long lines, and if there are no blanks or tabs before the specified column.
  */
-#include <ctype.h>
 #include <stdio.h>
 
 #include <cbook/utils.h>
