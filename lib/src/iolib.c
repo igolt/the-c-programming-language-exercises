@@ -21,12 +21,6 @@ fgetline(char *line, int max, FILE *stream)
   return i;
 }
 
-static int
-iswordchar(int c)
-{
-  return c == '_' || isalnum(c);
-}
-
 char *
 fgetword(char *word, int size, FILE *stream)
 {
@@ -42,10 +36,15 @@ fgetword(char *word, int size, FILE *stream)
   if (c == EOF)
     return NULL;
 
-  --size;
-  do
-    *w++ = c;
-  while (--size && iswordchar(c = getc(stream)));
+  *w++ = c;
+
+  if (isalnum(c) || c == '_') {
+    while (--size > 1 && (isalnum(c = getc(stream)) || c == '_'))
+      *w++ = c;
+
+    if (size > 1 && c != EOF)
+      ungetc(c, stream);
+  }
   *w = '\0';
 
   if (size && c != EOF)
