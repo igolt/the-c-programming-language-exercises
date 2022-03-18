@@ -6,11 +6,11 @@
 /* Convenient functions to write to stderr */
 #define eprint(s) fputs(s, stderr)
 #define eputs(s) fputs(s "\n", stderr)
-extern int eprintf(const char *fmt, ...);
+int eprintf(const char *fmt, ...);
 
-extern int getch(void);
+int getch(void);
 
-extern int ungetch(int c);
+int ungetch(int c);
 
 int fgetline(char *line, int max, FILE *stream);
 #define getline(line, max) fgetline(line, max, stdin)
