@@ -10,7 +10,7 @@
 #include <stddef.h>
 
 void *alloc(size_t n);
-#define memfree(ptr) do /* Not implemented yet */ while (0);
+#define memfree(ptr) do { /* Not implemented yet */ } while (0)
 #endif /* USE_CSTD */
 
 #endif /* IGOLT_ALLOC_H */
