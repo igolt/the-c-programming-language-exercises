@@ -1,9 +1,15 @@
+/*
+ * Exercise 6-1. Our version of getword does not properly
+ * handle underscores, string constants, comments, or
+ * preprocessos control lines. Write a better version
+ */
+
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
-#define DO_NOTHING /**/
-#define NOT_FOUND  (-1)
+#include <cbook/iolib.h>
+#include <cbook/utils.h>
 
 #define MAXWORD 100
 
@@ -22,81 +28,110 @@ struct key {
   {"void"    , 0},
   {"volatile", 0},
   {"while"   , 0},
-  {"while"   , 0},
 };
 
-#define NKEYS (sizeof(keytab) / sizeof(keytab[0]))
+#define NKEYS ARRAYSIZE(keytab)
 
-int getword(char *, int);
-int binsearch(const char *, struct key[], int);
+static struct key *binsearch(const char *, struct key[], size_t);
+static int _getword(char *word, int capacity);
 
 int
 main(void)
 {
-  int n;
+  struct key *k;
   char word[MAXWORD];
 
-  while (getword(word, MAXWORD) != EOF) {
+  while (_getword(word, MAXWORD) != EOF)
     if (isalpha(word[0]))
-      if ((n = binsearch(word, keytab, NKEYS)) >= 0)
-        ++keytab[n].count;
-  }
+      if ((k = binsearch(word, keytab, NKEYS)) != NULL)
+        ++k->count;
 
-  for (n = 0; n < NKEYS; ++n)
-    if (keytab[n].count > 0)
-      printf("%4d %s\n", keytab[n].count, keytab[n].word);
-
-  return 0;
+  for (k = keytab; k < keytab + NKEYS; ++k)
+    if (k->count > 0)
+      printf("%4d %s\n", k->count, k->word);
 }
 
-int
-getword(char *word, int max)
+static struct key *
+binsearch(const char *word, struct key keytab[], size_t size)
+{
+  struct key *low, *mid, *high;
+
+  low  = keytab;
+  high = keytab + size;
+
+  while (low < high) {
+    int cmp;
+
+    mid = low + (high - low) / 2;
+    cmp = strcmp(word, mid->word);
+
+    if (cmp == 0)
+      return mid;
+    else if (cmp < 0)
+      high = mid;
+    else
+      low = mid + 1;
+  }
+  return NULL;
+}
+
+static int
+_getword(char *word, int capacity)
 {
   int c;
+  char *w = word;
 
-  if (max <= 0)
+  if (--capacity < 1)
     return EOF;
 
-  while (isspace(c = getchar()))
-    DO_NOTHING;
+  while (isspace(c = getch()))
+    continue;
 
-  if (c != EOF)
-    *word++ = c;
-
-  if (!isalpha(c)) {
-    *word = '\0';
-    return c;
+  if (c == EOF) {
+    return EOF;
   }
 
-  for (; --max > 0; ++word) {
-    if (!isalnum(*word = getchar())) {
-      /* ungetch(*w); */
-      break;
+  *w++ = c;
+
+  if (c == '_' || c == '#' || isalpha(c)) {
+    for (; --capacity; *w++ = c) {
+      if (!isalnum(c = getch()) && c != '_') {
+        ungetch(c);
+        break;
+      }
+    }
+  } else if (c == '"') {
+    while (--capacity && (c = getch()) != EOF) {
+      *w++ = c;
+
+      if (c == '"') {
+        break;
+      } else if (c == '\\') {
+        if (--capacity || (c = getch()) == EOF) {
+          break;
+        }
+        *w++ = c;
+      }
+    }
+  } else if (c == '/') {
+    if (--capacity && (c = getch()) == '*') {
+      while (--capacity && (c = getch()) != EOF) {
+        *w++ = c;
+
+        if (c == '*') {
+          if (--capacity == 0 || (c = getch()) == EOF)
+            break;
+          *w++ = c;
+
+          if (c == '/')
+            break;
+        }
+      }
+    } else {
+      ungetch(c);
     }
   }
-  *word = '\0';
-  return c;
-}
 
-int
-binsearch(const char *word, struct key keytab[], int size)
-{
-  int low, high, mid;
-
-  low = 0;
-  high = size - 1;
-
-  while (low <= high) {
-    int comp;
-
-    mid = (low + high) / 2;
-
-    if ((comp = strcmp(keytab[mid].word, word)) == 0)
-      return mid;
-    else if (comp > 0)
-      low = mid;
-    else
-      high = mid;
-  }
-  return NOT_FOUND;
+  *w = '\0';
+  return word[0];
 }
