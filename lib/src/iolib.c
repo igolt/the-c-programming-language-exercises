@@ -4,6 +4,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#define FGETCH(stream)     ((stream) == stdin ? getch()    : getc(stream))
+#define UNGETCH(c, stream) ((stream) == stdin ? ungetch(c) : ungetc(c, stream))
+
 int
 fgetline(char *line, int max, FILE *stream)
 {
@@ -13,7 +16,7 @@ fgetline(char *line, int max, FILE *stream)
   --max;
   i = 0;
 
-  while (i < max && (c = fgetc(stream)) != EOF)
+  while (i < max && (c = FGETCH(stream)) != EOF)
     if ((line[i++] = c) == '\n')
       break;
   line[i] = '\0';
@@ -30,8 +33,8 @@ fgetword(char *word, int size, FILE *stream)
   if (size < 2)
     return NULL;
 
-  while (isspace(c = getc(stream)))
-    /* Skip white spaces */;
+  while (isspace(c = FGETCH(stream)))
+    continue;
 
   if (c == EOF)
     return NULL;
@@ -39,11 +42,11 @@ fgetword(char *word, int size, FILE *stream)
   *w++ = c;
 
   if (isalnum(c) || c == '_') {
-    while (--size > 1 && (isalnum(c = getc(stream)) || c == '_'))
+    while (--size > 1 && (isalnum(c = FGETCH(stream)) || c == '_'))
       *w++ = c;
 
     if (size > 1 && c != EOF)
-      ungetc(c, stream);
+      UNGETCH(c, stream);
   }
   *w = '\0';
 
