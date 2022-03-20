@@ -1,5 +1,6 @@
 BasedOnStyle: LLVM
 IndentWidth: 2
+IndentCaseLabels: true
 BreakBeforeBraces: Linux
 SpaceAfterCStyleCast: true
 AlignTrailingComments: true
