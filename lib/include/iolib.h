@@ -8,7 +8,7 @@
 /* Convenient functions to write to stderr */
 #define eprint(s) fputs(s, stderr)
 int eprintf(const char *fmt, ...);
-#define eputs(s) eprintf("%s\n", s)
+#define eputs(s) eprintf("%s\n", (s))
 
 int getch(void);
 
